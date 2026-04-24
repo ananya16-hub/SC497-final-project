@@ -1,0 +1,20 @@
+[project]
+name = "biostats-helper"
+version = "2.0.0"
+description = "A statistical analysis tool for SC497 with dataset generation, visualizations, and export features."
+authors = [
+    { name = "Ananya Sairanganthan" }
+]
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = [
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "scipy"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
