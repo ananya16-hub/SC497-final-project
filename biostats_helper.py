@@ -4,21 +4,21 @@ import seaborn as sns
 from scipy import stats
 
 
-def load_data(path):
-    """Load a CSV file into a pandas DataFrame."""
-    try:
-        df = pd.read_csv(path)
-        print("\nFile loaded successfully!\n")
-        print("Preview of data:")
-        print(df.head())
-        return df
-    except Exception as e:
-        print(f"Error loading file: {e}")
-        return None
+# ---------------------------------------------------------
+# Instead of loading a CSV, we load a built‑in dataset
+# ---------------------------------------------------------
+def load_data():
+    df = pd.DataFrame({
+        "group": ["A", "A", "A", "B", "B", "B"],
+        "value": [5, 7, 6, 10, 12, 11],
+        "height": [60, 62, 61, 70, 72, 71]
+    })
+    print("\nLoaded built‑in sample dataset:")
+    print(df.head())
+    return df
 
 
 def get_numeric_columns(df):
-    """Return a list of numeric column names."""
     numeric_cols = df.select_dtypes(include="number").columns.tolist()
     if not numeric_cols:
         print("No numeric columns found in this dataset.")
@@ -30,7 +30,6 @@ def get_numeric_columns(df):
 
 
 def choose_column(columns, prompt):
-    """Let the user choose a column from a list by index."""
     while True:
         try:
             choice = int(input(prompt))
@@ -43,23 +42,22 @@ def choose_column(columns, prompt):
 
 
 def run_ttest(df):
-    """Run an independent t-test on one numeric column split by a categorical column."""
     print("\n=== Independent t-test ===")
 
-    # Choose grouping column (categorical-like)
     print("\nAvailable columns:")
     for i, col in enumerate(df.columns):
         print(f"{i+1}. {col}")
     group_col = choose_column(df.columns.tolist(), "Choose grouping (categorical) column (number): ")
 
-    # Choose numeric column
     numeric_cols = get_numeric_columns(df)
     if not numeric_cols:
         return
     value_col = choose_column(numeric_cols, "Choose numeric outcome column (number): ")
 
     data = df[[group_col, value_col]].dropna()
-    groups = data[group_col].unique()
+
+    # FIXED: ensure Series, not DataFrame
+    groups = data[group_col].astype(str).unique()
 
     if len(groups) != 2:
         print(f"\nSelected grouping column has {len(groups)} levels; t-test requires exactly 2.")
@@ -77,20 +75,10 @@ def run_ttest(df):
 
     alpha = 0.05
     if p_val < alpha:
-        interp = (
-            f"The p-value ({p_val:.4g}) is less than 0.05, "
-            "suggesting a statistically significant difference between the two groups."
-        )
+        print(f"\nInterpretation: p < {alpha}, so the difference is statistically significant.")
     else:
-        interp = (
-            f"The p-value ({p_val:.4g}) is greater than 0.05, "
-            "suggesting no statistically significant difference between the two groups."
-        )
+        print(f"\nInterpretation: p ≥ {alpha}, so the difference is NOT statistically significant.")
 
-    print("\nInterpretation:")
-    print(interp)
-
-    # Boxplot
     print("\nGenerating boxplot...")
     plt.figure(figsize=(6, 4))
     sns.boxplot(x=group_col, y=value_col, data=data)
@@ -100,7 +88,6 @@ def run_ttest(df):
 
 
 def run_correlation(df):
-    """Run Pearson correlation between two numeric columns."""
     print("\n=== Correlation Analysis ===")
 
     numeric_cols = get_numeric_columns(df)
@@ -126,30 +113,10 @@ def run_correlation(df):
 
     alpha = 0.05
     if p_val < alpha:
-        sig_text = "statistically significant"
+        print(f"\nInterpretation: p < {alpha}, so the correlation is statistically significant.")
     else:
-        sig_text = "not statistically significant"
+        print(f"\nInterpretation: p ≥ {alpha}, so the correlation is NOT statistically significant.")
 
-    if abs(r_val) < 0.2:
-        strength = "very weak"
-    elif abs(r_val) < 0.4:
-        strength = "weak"
-    elif abs(r_val) < 0.6:
-        strength = "moderate"
-    elif abs(r_val) < 0.8:
-        strength = "strong"
-    else:
-        strength = "very strong"
-
-    interp = (
-        f"The correlation between {x_col} and {y_col} is {strength} "
-        f"({r_val:.2f}), and the relationship is {sig_text} at the 0.05 level."
-    )
-
-    print("\nInterpretation:")
-    print(interp)
-
-    # Scatterplot with regression line
     print("\nGenerating scatterplot with regression line...")
     plt.figure(figsize=(6, 4))
     sns.regplot(x=x_col, y=y_col, data=data, line_kws={"color": "red"})
@@ -160,11 +127,9 @@ def run_correlation(df):
 
 def main():
     print("=== BioStats Helper (Python Final Project) ===")
-    path = input("Enter path to your CSV file: ").strip()
 
-    df = load_data(path)
-    if df is None:
-        return
+    # NO CSV. Just load built‑in data.
+    df = load_data()
 
     while True:
         print("\nChoose an analysis:")
