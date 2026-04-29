@@ -56,7 +56,6 @@ The application includes:
 | **Correlation Analysis** | Pearson correlation with regression plot |
 | **Correlation Heatmap** | Visualize relationships between all numeric variables |
 | **One-Way ANOVA** | Compare means across groups |
-| **Save Dataset to CSV** | Export the generated dataset |
 | **Save Plots** | Save visualizations as PNG files |
 | **Export Results** | Save statistical outputs to timestamped text files |
 | **View Raw Data** | Preview the first 10 rows |
